@@ -1,0 +1,21 @@
+<!doctype html>
+
+<title>Dr4K4n's Homepage</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='static.css') }}">
+<div class=page>
+
+    <div class=header>
+    <h1><a href="{{ url_for('home') }}">Dr4K4n's Homepage</a></h1>
+    </div>
+    
+    <div class=menu>             
+        <a href="{{ url_for('gallery') }}">Galerie</a>
+        <a href="{{ url_for('impressum') }}">Impressum</a>
+    </div>
+    
+    {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+    {% endfor %}
+    
+    {% block body %}{% endblock %}
+</div>
