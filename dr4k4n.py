@@ -25,11 +25,13 @@ class User(db.Model):
     username = db.Column(db.String(50), nullable=False, unique=True)
     _password = db.Column(db.String(32), nullable=False)
     email = db.Column(db.String(60), nullable=False, unique=True)
+    admin = db.Column(db.Boolean)
     
-    def __init__(self, username, email, password=u''):
+    def __init__(self, username, email, password, admin):
         self.username = username
         self.email = email
         self.password = password
+        self.admin = admin
     
     def _set_password(self, password):
         self._password = md5(password).hexdigest()
@@ -43,7 +45,10 @@ class User(db.Model):
         print self.password
         print md5(password).hexdigest()
         return self.password == md5(password).hexdigest()
-        
+    
+    def is_admin(self):
+        return admin
+    
     def __repr__(self):
         return '<User %r>' % self.username
 
@@ -52,6 +57,7 @@ class BlogPost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    author = db.relationship(User, uselist=False, backref=db.backref('users',cascade="none"))
     shorttext = db.Column(db.Text, nullable=False)
     longtext = db.Column(db.Text, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
@@ -68,7 +74,13 @@ class BlogPost(db.Model):
 # static pages
 @app.route('/')
 def home():
-    return render_template('main.html')
+    posts = BlogPost.query.limit(10).all()
+    return render_template('main.html', posts=posts)
+
+@app.route('/read/<int:post_id>')
+def read_post(post_id):
+    post = BlogPost.query.get(post_id)
+    return render_template('read.html', post=post)
 
 @app.route('/gallery')
 def gallery():
@@ -89,14 +101,17 @@ def login():
             session['admin'] = True
             session['user_id'] = 1
         else:
-            print request.form['password']
             user = User.query.filter_by(username=request.form['username']).first()
-            print user
             if user and user.check_password(request.form['password']):
                 session['logged_in'] = True
                 session['user_id'] = user.id
-                flash(u'Moinsen')
-                return redirect(url_for('show_tree'))
+                session['admin'] = user.admin
+                if user.admin:
+                    flash(u'Moinsen')
+                    return redirect(url_for('home'))
+                else:
+                    flash(u'Tach Chef!')
+                    return redirect(url_for('admin'))
             else:
                 error = u'Öhm... verkehrt :-('
         
@@ -108,7 +123,6 @@ def logout():
     flash(u'Auf wiedersehen :)')
     return redirect(url_for('home')) 
  
-
 # admin menu 
 @app.route('/admin') 
 def admin():
@@ -141,26 +155,39 @@ def user_new():
     if not request.form:
         return render_template('user_new.html');    
  
-    newUser = User(request.form['username'], request.form['email'], request.form['password'])
+    newUser = User(request.form['username'], request.form['email'], request.form['password'], request.form['admin'])
     db.session.add(newUser)
     db.session.commit()
     
     flash(u'nice one - is drin ;-)')
     return redirect(url_for('admin'))
 
- 
-@app.route('/user/<int:user_id>/edit',methods=['GET'])
+@app.route('/user/<int:user_id>/edit',methods=['GET','POST'])
 def user_edit(user_id):
     if not session.get('logged_in'):        
         flash(u'ohne Login wird das aber nix...')
         return redirect(url_for('login'))
         
     user = User.query.get(user_id)
+    newUser = user
     
     if user is None:
         flash(u'Bidde? den kennsch ned!')
         return redirect(url_for('admin'))
     
+    if request.form:
+        newUserAdmin = 0
+        if 'admin' in request.form and request.form['admin'] == 'on':
+            newUserAdmin = 1
+        if request.form['password'] != "":
+            user.password = request.form['password']
+        user.username = request.form['username']
+        user.email = request.form['email']
+        user.admin = newUserAdmin
+        db.session.commit()
+        flash(u'check! Hab ich')
+        return redirect(url_for('admin'))
+        
     return render_template('user_edit.html',user=user);
 
 @app.route('/user/<int:user_id>/del',methods=['GET'])
@@ -214,10 +241,19 @@ def bloggen_edit(post_id):
         return redirect(url_for('login'))
         
     post = BlogPost.query.get(post_id)
-    
+
     if post is None:
         flash(u'Bidde? den kennsch ned!')
         return redirect(url_for('admin'))
+    
+    if request.form:
+        post.title = request.form['title']
+        post.shorttext = request.form['shorttext']
+        post.longtext = request.form['longtext']
+
+        db.session.commit()
+        flash(u'check! Hab ich')
+        return redirect(url_for('admin'))  
     
     return render_template('bloggen_edit.html',post=post);
 

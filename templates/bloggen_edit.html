@@ -1,0 +1,17 @@
+{% extends "index.html" %}
+{% block body %}
+
+<h3>ick will was bloggen :)</h3>
+
+<form method="post">
+
+<input type="text" name="title" value="{{ post.title }}"><br>
+<textarea name="shorttext">{{ post.shorttext }}
+</textarea><br>
+<textarea name="longtext">{{ post.longtext }}
+</textarea><br>
+
+<input type="submit" value=" läuft... ">
+</form>
+
+{% endblock %}
