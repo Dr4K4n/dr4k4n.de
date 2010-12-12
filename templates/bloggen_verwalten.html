@@ -1,0 +1,20 @@
+{% extends "index.html" %}
+{% block body %}
+
+<h3>ick will was bloggen :)</h3>
+
+<table>
+
+<tr><th colspan="3">Title</th></tr>
+
+{% for post in blogPosts %}
+<tr>
+    <td>{{ post.title }}</td>
+    <td><a href="{{ url_for('bloggen_edit', post_id=post.id) }}">EDIT</a></td>
+    <td><a href="{{ url_for('bloggen_del', post_id=post.id) }}">DEL</a></td>
+</tr>
+{% endfor %}
+
+</table>
+
+{% endblock %}

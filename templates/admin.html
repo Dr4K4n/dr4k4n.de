@@ -1,0 +1,13 @@
+{% extends "index.html" %}
+{% block body %}
+
+<h3>i can haz root O_o</h3>
+
+<ul>
+<li><a href="{{ url_for('bloggen_new') }}">was bloggen...</a></li>
+<li><a href="{{ url_for('bloggen_verwalten') }}">Blogposts verwalten</a></li> 
+<li><a href="{{ url_for('user_new') }}">Atze hinzufügen</a></li>
+<li><a href="{{ url_for('user_verwalten') }}">Atzen verwalten</a></li> 
+</ul>
+
+{% endblock %}
