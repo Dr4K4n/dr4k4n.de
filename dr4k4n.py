@@ -57,7 +57,7 @@ class BlogPost(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(50), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    author = db.relationship(User, uselist=False, backref=db.backref('users',cascade="none"))
+    author = db.relationship(User, uselist=False, backref=db.backref('BlogPoster',cascade="none"))
     shorttext = db.Column(db.Text, nullable=False)
     longtext = db.Column(db.Text, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
@@ -68,27 +68,49 @@ class BlogPost(db.Model):
         self.shorttext = shorttext;
         self.longtext = longtext;
     
+    def getShorttext(self):
+        return unicode.replace(self.shorttext,'\n','<br>')
+        
+    def getText(self):
+        return unicode.replace(self.shorttext + self.longtext,'\n','<br>')
+    
     def __repr__(self):
         return '<BlogPost %r>' % self.id
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    author = db.relationship(User, uselist=False, backref=db.backref('commentUsers',cascade="none"))
+    comment = db.Column(db.Text, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    
+    def __init__(self, author, comment, date):
+        self.author = author
+        self.comment = comment
+        self.date = date
+    
+    def __repr__(self):
+        return '<Comment %r>' % self.id
 
 # static pages
 @app.route('/')
 def home():
     posts = BlogPost.query.limit(10).all()
-    return render_template('main.html', posts=posts)
+    return render_template('main.html', current='home', posts=posts)
 
 @app.route('/read/<int:post_id>')
 def read_post(post_id):
     post = BlogPost.query.get(post_id)
-    return render_template('read.html', post=post)
+    return render_template('read.html', current='home', post=post)
 
 @app.route('/gallery')
 def gallery():
-    return render_template('gallery.html')
+    return render_template('gallery.html', current='gallery')
     
 @app.route('/impressum')
 def impressum():
-    return render_template('impressum.html')
+    return render_template('impressum.html', current='impressum')
 
 # login / logout    
 @app.route('/login',methods=['GET', 'POST'])
@@ -115,14 +137,25 @@ def login():
             else:
                 error = u'Öhm... verkehrt :-('
         
-    return render_template('login.html', error=error)    
+    return render_template('login.html', current='login', error=error)    
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
     flash(u'Auf wiedersehen :)')
     return redirect(url_for('home')) 
- 
+
+# search
+@app.route('/search',methods=['GET'])
+def search():
+    q = request.args.get('q')
+    if len(q) > 3:
+        posts = BlogPost.query.from_statement('SELECT * FROM blogposts WHERE title LIKE "%user%"').all()
+    else:        
+        flash('Leider nix gefunden... hast du mindestens 3 Zeichen eingegeben ?')
+        posts = []
+    return render_template('search.html', current='home', posts=posts)
+
 # admin menu 
 @app.route('/admin') 
 def admin():
@@ -133,7 +166,7 @@ def admin():
         flash(u'Hier haste nix verloren - husch husch !')        
         return redirect(url_for('home'))
         
-    return render_template('admin.html')
+    return render_template('admin.html', current='admin')
 
 # user verwaltung
 @app.route('/user/verwalten')
@@ -144,7 +177,7 @@ def user_verwalten():
     
     users = User.query.all()
     
-    return render_template('user_verwalten.html', users=users)
+    return render_template('user_verwalten.html', current='admin', users=users)
 
 @app.route('/user/new',methods=['GET', 'POST'])
 def user_new():
@@ -153,9 +186,20 @@ def user_new():
         return redirect(url_for('login'))
     
     if not request.form:
-        return render_template('user_new.html');    
- 
-    newUser = User(request.form['username'], request.form['email'], request.form['password'], request.form['admin'])
+        return render_template('user_new.html', current='admin');    
+    
+    print '1'
+    
+    newUserAdmin = 0
+    if 'admin' in request.form and request.form['admin'] == 'on':
+        newUserAdmin = 1
+    
+    print '2'
+     
+    newUser = User(request.form['username'], request.form['email'], request.form['password'], newUserAdmin)
+    
+    print '3'
+    
     db.session.add(newUser)
     db.session.commit()
     
@@ -176,9 +220,9 @@ def user_edit(user_id):
         return redirect(url_for('admin'))
     
     if request.form:
-        newUserAdmin = 0
+        editUserAdmin = 0
         if 'admin' in request.form and request.form['admin'] == 'on':
-            newUserAdmin = 1
+            editUserAdmin = 1
         if request.form['password'] != "":
             user.password = request.form['password']
         user.username = request.form['username']
@@ -188,7 +232,7 @@ def user_edit(user_id):
         flash(u'check! Hab ich')
         return redirect(url_for('admin'))
         
-    return render_template('user_edit.html',user=user);
+    return render_template('user_edit.html', current='admin',user=user);
 
 @app.route('/user/<int:user_id>/del',methods=['GET'])
 def user_del(user_id):
@@ -217,7 +261,7 @@ def bloggen_verwalten():
     
     blogPosts = BlogPost.query.all()
     
-    return render_template('bloggen_verwalten.html', blogPosts=blogPosts)
+    return render_template('bloggen_verwalten.html', current='admin', blogPosts=blogPosts)
 
 @app.route('/bloggen/new',methods=['GET', 'POST'])
 def bloggen_new():
@@ -226,7 +270,7 @@ def bloggen_new():
         return redirect(url_for('login'))
     
     if not request.form:
-        return render_template('bloggen_new.html');
+        return render_template('bloggen_new.html', current='admin');
     
     newPost = BlogPost(request.form['title'], session['user_id'], request.form['shorttext'], request.form['longtext'])
     db.session.add(newPost)
@@ -250,12 +294,11 @@ def bloggen_edit(post_id):
         post.title = request.form['title']
         post.shorttext = request.form['shorttext']
         post.longtext = request.form['longtext']
-
         db.session.commit()
         flash(u'check! Hab ich')
         return redirect(url_for('admin'))  
     
-    return render_template('bloggen_edit.html',post=post);
+    return render_template('bloggen_edit.html', current='admin', post=post);
 
 @app.route('/bloggen/<int:post_id>/del',methods=['GET', 'POST'])
 def bloggen_del(post_id):

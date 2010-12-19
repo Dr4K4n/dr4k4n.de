@@ -1,26 +1,106 @@
-<!doctype html>
+{% macro navItem(title, menuPunkt, current) -%}
+<li class="{{ 'current'if current==menuPunkt }}"><a href="{{ url_for(menuPunkt) }}">{{ title }}</a></li>
+{%- endmacro %}
 
-<title>Dr4K4n's Homepage</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='static.css') }}">
-<div class=page>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" />
+    
+    <!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    
+    <title>Dr4K4n's Homepage</title>
+    
+    <link href="{{ url_for('static', filename='960.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css" />  
+    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/x-icon">    
+</head>
 
-    <div class=header>
-    <h1><a href="{{ url_for('home') }}">Dr4K4n's Homepage</a></h1>
-    </div>
+<body>
+
+    <div id="wrapper" class="container_12">
+
+        <header id="header" class="grid_12">
+            <h1><a href="{{ url_for('home') }}">Dr4K4n's Homepage</a></h1>
+        </header>
+        <!-- end header -->
+        
+        <div id="content">
+            <nav>
+            <ul id="menu" class="clearfix">
+                {{ navItem('Home','home',current) }}
+                {{ navItem('Galerie','gallery',current) }}
+                {{ navItem('Impressum','impressum',current) }}               
+                {% if session['logged_in'] %}
+                    {% if session['admin'] %}
+                        {{ navItem('Admin','admin',current) }}
+                    {% endif %}
+                    {{ navItem('Logout','logout',current) }}
+                {% else %}
+                    {{ navItem('Login','login',current) }}
+                {% endif %}
+            </ul>
+            </nav>
+
+            <!-- Show a "Please Upgrade" box to both IE7 and IE6 users (Edit to IE 6 if you just want to show it to IE6 users) - jQuery will load the content from js/ie.html into the div -->
+            
+            <!--[if lte IE 7]>
+            	<div class="ie grid_7"></div>
+            <![endif]-->
+            
+      
+            {% for message in get_flashed_messages() %}
+            <div class="flash">{{ message }}</div>
+            {% endfor %}
+
+            <div id="main" class="grid_8 alpha">            
+            {% block body %}{% endblock %}
+            </div> <!-- end main -->      
+            
+            <div id="sidebar" class="grid_4 omega">
     
-    <div class=menu>             
-        <a href="{{ url_for('gallery') }}">Galerie</a>
-        <a href="{{ url_for('impressum') }}">Impressum</a>
-        {% if session['logged_in'] %}
-            <a href="{{ url_for('logout') }}">Logout</a>
-        {% else %}        
-            <a href="{{ url_for('login') }}">Login</a>
-        {% endif %}
-    </div>
-    
-    {% for message in get_flashed_messages() %}
-    <div class=flash>{{ message }}</div>
-    {% endfor %}
-    
-    {% block body %}{% endblock %}
-</div>
+                <!--<aside class="widget">
+                    <h3>Sidebar heading</h3>
+                    
+                    <ul>
+                        <li><a href="#">Li element</a></li>
+                        <li><a href="#">Li element</a></li>
+                        <li><a href="#">Li element</a></li>
+                        <li><a href="#">Li element</a></li>
+                        <li><a href="#">Li element</a></li>
+                    </ul>
+                </aside>--> <!-- end widget -->
+        
+                <aside class="widget">
+                    <form action="/search" method="get">
+                        <input type="search" name="q" results="10" placeholder=" Search..." />
+                        <input type="submit" value="Search..." />
+                    </form>
+                </aside> <!-- end widget -->
+                
+                <aside class="widget">
+                    <h3>Twitter</h3>
+                    
+                    <p>
+                        Twitter Feed Baby!
+                    </p>
+                </aside> <!-- end widget -->
+            
+            </div> <!-- end sidebar -->
+            
+        </div> <!-- end content -->
+        
+        <footer id="footer" class="grid_12">
+        <!-- You're free to remove the credit link in the footer, but please, please leave it there. -->
+        <p>Copyright &copy; 2010 <a href="#">Dr4K4n.de</a> - Design by <a href="http://jayj.dk" title="Design by Jayj.dk">Jayj.dk</a></p>
+        </footer> <!-- end footer -->
+        
+        <div class="clear"></div>        
+    </div> <!-- end wrapper -->
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/script.js') }}"></script>
+
+</body>
+</html>

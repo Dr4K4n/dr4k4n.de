@@ -1,13 +1,20 @@
 {% extends "index.html" %}
 {% block body %}
 
-<h3>Hello again!</h3>
+<article class="post">
 
-<div name="post">
-<h4>{{ post.title }}</h4>
-<p>von <a href="mailto:{{ post.author.email }}">{{ post.author.username }}</a></p>
-<p>{{ post.shorttext }}</p>
-<p>{{ post.longtext }}</p>
-</div>
+<h2><a href="#">{{ post.title }}</a></h2>
+
+<a href="#"><img src="{{ url_for('static', filename='images/thumbnail.jpg') }}" alt="" class="thumbnail alignleft" /></a>
+
+<p>{{ post.getText()|safe }}</p>
+
+<div class="clear"></div>
+
+<footer class="postmeta">
+    <span class="btn alignleft">von <a href="mailto:{{ post.author.email }}">{{ post.author.username }}</a> am  <time datetime="{{ post.date }}" pubdate>{{ post.date }}</time></span>
+</footer>
+
+</article>
 
 {% endblock %}

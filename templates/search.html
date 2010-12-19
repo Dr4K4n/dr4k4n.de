@@ -1,0 +1,14 @@
+{% extends "index.html" %}
+{% block body %}
+
+
+
+<h2>Suchergebnisse</h2>
+
+<ul>
+{% for post in posts %}
+<li><a href="{{ url_for('read_post', post_id=post.id) }}">{{ post.title }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

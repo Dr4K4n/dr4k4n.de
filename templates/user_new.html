@@ -3,15 +3,34 @@
 
 <h3>Atze hinzufügen</h3>
 
-<form method="post">
+<form method="post" id="contactform">
 
-<input type="text" name="username"><br>
-<input type="password" name="password"><br>
-<input type="password" name="password2"><br>
-<input type="text" name="email"><br>
-<input type="checkbox" name="admin"><br>
+<p>
+    <input type="text" name="username" class="grid_3">
+    <label for="username">Username</label>
+</p>
 
-<input type="submit" name="submit" value=" check digga! ">
+<p>
+    <input type="password" name="password" class="grid_3">
+    <label for="username">Passwort</label>
+</p>
+
+<p>
+    <input type="password" name="password2" class="grid_3">
+    <label for="username">Passwort</label>
+</p>
+
+<p>
+    <input type="email" name="email" class="grid_3">
+    <label for="username">E-Mail</label>
+</p>
+
+<p>
+    <input type="checkbox" name="admin" class="grid_1">
+    <label for="username">Admin?</label>
+</p>
+
+<input type="submit" name="submit" class="grid_2" value=" check digga! ">
 </form>
 
 {% endblock %}
