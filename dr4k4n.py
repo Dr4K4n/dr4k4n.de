@@ -96,11 +96,39 @@ class Comment(db.Model):
     def __repr__(self):
         return '<Comment %r>' % self.id
 
+class StaticPage(db.Model):
+    __tablename__ = 'static_pages'
+    id = db.Column(db.Integer, primary_key=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    author = db.relationship(User, uselist=False, backref=db.backref('pageAuthor',cascade='none'))
+    date = db.Column(db.DateTime, nullable=False)
+    title = db.Column(db.String(50), nullable=False)
+    text = db.Column(db.Text, nullable=False)
+    menu = db.Column(db.Boolean, nullable=False)
+    
+    def __init__(self, title, text, author_id, menu):
+        self.title = title
+        self.text = text
+        self.author_id = author_id
+        self.menu = menu
+        
+    def getText(self):
+        return unicode.replace(self.text,'\n','<br>')
+    
+    def __repr__(self):
+        return '<Page %r>' % self.id
+
+# render_template override
+def my_render_template(self, **args):
+    pages = StaticPage.query.filter(StaticPage.menu==1).all()
+    args['menuPages'] = pages
+    return render_template(self, **args)
+
 # main pages
 @app.route('/')
 def home():
     posts = BlogPost.query.limit(10).all()
-    return render_template('main.html', current='home', posts=posts)
+    return my_render_template('main.html', current='home', posts=posts)
 
 @app.route('/read/<int:post_id>', methods=['GET','POST'])
 def read_post(post_id):
@@ -112,15 +140,22 @@ def read_post(post_id):
     post = BlogPost.query.get(post_id)
     comments = Comment.query.filter(Comment.post_id == post.id).all()
     logged_in = ('user_id' in session)
-    return render_template('read.html', current='home', post=post, comments=comments, logged_in=logged_in)
+    return my_render_template('read.html', current='home', post=post, comments=comments, logged_in=logged_in)
 
 @app.route('/gallery')
 def gallery():
-    return render_template('gallery.html', current='gallery')
+    return my_render_template('gallery.html', current='gallery')
     
 @app.route('/impressum')
 def impressum():
-    return render_template('impressum.html', current='impressum')
+    return my_render_template('impressum.html', current='impressum')
+
+@app.route('/page/<int:page_id>')
+def staticPage(page_id):
+    page = StaticPage.query.get(page_id)
+    if page != None:
+        return my_render_template('static_page.html', current=page.id, page=page)
+    return my_render_template('404.html')
 
 # login / logout    
 @app.route('/login',methods=['GET', 'POST'])
@@ -141,7 +176,7 @@ def login():
 		else:
 			error = u'Öhm... verkehrt :-('
         
-    return render_template('login.html', current='login', error=error)    
+    return my_render_template('login.html', current='login', error=error)    
 
 @app.route('/logout')
 def logout():
@@ -154,11 +189,14 @@ def logout():
 def search():
     q = request.args.get('q')
     if len(q) > 2:
-        posts = BlogPost.query.from_statement('SELECT * FROM blogposts WHERE title LIKE "%user%"').all()
+        posts = BlogPost.query.from_statement('SELECT * FROM blogposts WHERE title LIKE "%'+q+'%"').all()        
+        pages = StaticPage.query.from_statement('SELECT * FROM static_pages WHERE title LIKE "%'+q+'%"').all()        
+        return my_render_template('search.html', current='home', posts=posts, pages=pages)
     else:        
         flash('Leider nix gefunden... hast du mindestens 3 Zeichen eingegeben ?')
         posts = []
-    return render_template('search.html', current='home', posts=posts)
+        pages = []
+    return redirect(url_for('home'))
 
 # admin menu 
 @app.route('/intern') 
@@ -167,7 +205,7 @@ def intern():
         flash(u'ohne Login wird das aber nix...')
         return redirect(url_for('login'))
 
-    return render_template('intern.html', current='intern', admin=session.get('admin'))
+    return my_render_template('intern.html', current='intern', admin=session.get('admin'))
 
 # user verwaltung
 @app.route('/user/verwalten')
@@ -181,7 +219,7 @@ def user_verwalten():
     
     users = User.query.all()
     
-    return render_template('user_verwalten.html', current='intern', users=users)
+    return my_render_template('user_verwalten.html', current='intern', users=users)
 
 @app.route('/user/new',methods=['GET', 'POST'])
 def user_new():
@@ -193,7 +231,7 @@ def user_new():
         return redirect(url_for('home'))
         
     if not request.form:
-        return render_template('user_new.html', current='intern');    
+        return my_render_template('user_new.html', current='intern');    
     
     newUserAdmin = 0
     if 'admin' in request.form and request.form['admin'] == 'on':
@@ -236,7 +274,7 @@ def user_edit(user_id):
         flash(u'check! Hab ich')
         return redirect(url_for('intern'))
         
-    return render_template('user_edit.html', current='intern',user=user);
+    return my_render_template('user_edit.html', current='intern',user=user);
 
 @app.route('/user/<int:user_id>/del',methods=['GET'])
 def user_del(user_id):
@@ -268,7 +306,7 @@ def bloggen_verwalten():
     
     blogPosts = BlogPost.query.all()
     
-    return render_template('bloggen_verwalten.html', current='intern', blogPosts=blogPosts)
+    return my_render_template('bloggen_verwalten.html', current='intern', blogPosts=blogPosts)
 
 @app.route('/bloggen/new',methods=['GET', 'POST'])
 def bloggen_new():
@@ -277,7 +315,7 @@ def bloggen_new():
         return redirect(url_for('login'))
     
     if not request.form:
-        return render_template('bloggen_new.html', current='intern');
+        return my_render_template('bloggen_new.html', current='intern');
     
     newPost = BlogPost(request.form['title'], session['user_id'], request.form['shorttext'], request.form['longtext'])
     db.session.add(newPost)
@@ -305,7 +343,7 @@ def bloggen_edit(post_id):
         flash(u'check! Hab ich')
         return redirect(url_for('intern'))  
     
-    return render_template('bloggen_edit.html', current='intern', post=post);
+    return my_render_template('bloggen_edit.html', current='intern', post=post);
 
 @app.route('/bloggen/<int:post_id>/del',methods=['GET', 'POST'])
 def bloggen_del(post_id):
@@ -325,6 +363,80 @@ def bloggen_del(post_id):
     flash(u'Post entfernt')
     return redirect(url_for('intern'))
 
+# static page verwaltung
+@app.route('/page/verwalten')
+def page_verwalten():
+    if not session.get('logged_in'):        
+        flash(u'ohne Login wird das aber nix...')
+        return redirect(url_for('login'))
+    
+    pages = StaticPage.query.all()
+    
+    return my_render_template('page_verwalten.html', pages=pages)
+
+@app.route('/page/new',methods=['GET', 'POST'])
+def page_new():
+    if not session.get('logged_in'):        
+        flash(u'ohne Login wird das aber nix...')
+        return redirect(url_for('login'))
+    
+    if not request.form:
+        return my_render_template('page_new.html', current='intern');
+    
+    newPageMenu = 0
+    if 'menu' in request.form and request.form['menu'] == 'on':
+        newPageMenu = 1
+    
+    newPage = StaticPage(request.form['title'], request.form['text'], session['user_id'], newPageMenu)
+    db.session.add(newPage)
+    db.session.commit()
+    flash(u'nice one - is drin ;-)')
+    return redirect(url_for('intern'))
+ 
+@app.route('/page/<int:page_id>/edit',methods=['GET', 'POST'])
+def page_edit(page_id):
+    if not session.get('logged_in'):        
+        flash(u'ohne Login wird das aber nix...')
+        return redirect(url_for('login'))
+        
+    page = StaticPage.query.get(page_id)
+
+    if page is None:
+        flash(u'Bidde? den kennsch ned!')
+        return redirect(url_for('intern'))
+    
+    if request.form:
+        editPageMenu = 0
+        if 'menu' in request.form and request.form['menu'] == 'on':
+            editPageMenu = 1
+        page.title = request.form['title']
+        page.text = request.form['text']
+        page.menu = editPageMenu
+        db.session.commit()
+        flash(u'check! Hab ich')
+        return redirect(url_for('intern'))  
+    
+    return my_render_template('page_edit.html', current='intern', page=page);
+
+@app.route('/page/<int:page_id>/del',methods=['GET', 'POST'])
+def page_del(page_id):
+    if not session.get('logged_in'):        
+        flash(u'ohne Login wird das aber nix...')
+        return redirect(url_for('login'))
+        
+    page = StaticPage.query.get(page_id)
+    
+    if page is None:
+        flash(u'Bidde? den kennsch ned!')
+        return redirect(url_for('intern'))
+    
+    db.session.delete(page)
+    db.session.commit()
+    
+    flash(u'Page entfernt')
+    return redirect(url_for('intern'))
+
+# Twitter Backend
 @app.route('/backend/getTweets')
 def get_tweets():
 	tweetsAll = twitter.getUserTimeline(screen_name='Dr4K4n')
@@ -335,7 +447,7 @@ def get_tweets():
 			break
 		tweets.append([t['id'],t['text']])
 		t_i += 1
-	return render_template('backend/tweets.html', tweets=tweets)
+	return my_render_template('backend/tweets.html', tweets=tweets)
 	
 # start
 if __name__ == '__main__':

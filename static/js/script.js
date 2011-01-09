@@ -6,6 +6,6 @@ $(document).ready(function(){
     
     $(".error").delay(5000).slideUp("slow");    
         
-    $(".twitter").load("backend/getTweets"); // Load twitter feeds
+    $(".twitter").load("/backend/getTweets"); // Load twitter feeds
     
 });

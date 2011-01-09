@@ -9,6 +9,9 @@
 {% for post in posts %}
 <li><a href="{{ url_for('read_post', post_id=post.id) }}">{{ post.title }}</a></li>
 {% endfor %}
+{% for page in pages %}
+<li><a href="{{ url_for('staticPage', page_id=page.id) }}">{{ page.title }}</a></li>
+{% endfor %}
 </ul>
 
 {% endblock %}

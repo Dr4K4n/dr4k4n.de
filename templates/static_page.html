@@ -1,0 +1,12 @@
+{% extends "index.html" %}
+{% block body %}
+
+<h3>{{ page.title }}</h3>
+
+<p>
+{{ page.getText()|safe }}
+</p>
+
+von <a href="mailto:{{ page.author.email }}">{{ page.author.username }}</a>, letztes Update {{ page.date }}
+
+{% endblock %}

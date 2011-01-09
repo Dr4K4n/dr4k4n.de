@@ -189,6 +189,11 @@ blockquote p { margin: 0; }
 	transform: scale(1.1);
 }
 
+#header img {
+    float: right;
+    margin-right: 75px;
+}
+
 /* Content */
 #content { 
 	background: url(images/content_bg.png) repeat; /* Fallback for browser that doesn't support rgba */

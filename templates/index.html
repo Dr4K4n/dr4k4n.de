@@ -2,6 +2,10 @@
 <li class="{{ 'current'if current==menuPunkt }}"><a href="{{ url_for(menuPunkt) }}">{{ title }}</a></li>
 {%- endmacro %}
 
+{% macro navItemStatic(title, page, current) -%}
+<li class="{{ 'current'if current==page }}"><a href="{{ url_for('staticPage', page_id=page) }}">{{ title }}</a></li>
+{%- endmacro %}
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -23,6 +27,7 @@
 
         <header id="header" class="grid_12">
             <h1><a href="{{ url_for('home') }}">Dr4K4n's Homepage</a></h1>
+            <img src="{{ url_for('static', filename='images/rial-lugano.png') }}">
         </header>
         <!-- end header -->
         
@@ -30,6 +35,9 @@
             <nav>
             <ul id="menu" class="clearfix">
                 {{ navItem('Home','home',current) }}
+                {% for page in menuPages %}
+                    {{ navItemStatic(page.title, page.id, current) }}
+                {% endfor %}
                 {{ navItem('Galerie','gallery',current) }}
                 {{ navItem('Impressum','impressum',current) }}               
                 {% if session['logged_in'] %}

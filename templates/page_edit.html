@@ -1,0 +1,27 @@
+{% extends "index.html" %}
+{% block body %}
+
+<h3>eine Seite - make it better!</h3>
+
+<form method="post">
+
+<p>
+    <input type="text" name="title" class="grid_3" value="{{ page.title }}">
+    <label for="title">Titel</label>
+</p>
+
+<p>
+    <textarea name="text" class="grid_3">{{ page.text }}</textarea>
+    <label for="text">Text</label>
+</p>
+
+<p>
+    <input type="checkbox" name="menu" class="grid_3" {% if page.menu %}checked="checked"{% endif %}>
+    <label for="menu">Show in Menu?</label>
+</p>
+
+<input type="submit" name="submit" value=" läuft... " class="grid_2">
+
+</form>
+
+{% endblock %}
