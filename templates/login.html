@@ -5,9 +5,17 @@
 
 {% if error %}<p class=error><strong>Error:</strong> {{ error }}</p>{% endif %}
 <form name="login" method="post">
-<input type="text" name="username">
-<input type="password" name="password">
-<input type="submit" value=" Log me in! "> 
+<p>
+    <input type="text" name="username">
+    <label for="username">Username</label>
+</p>
+<p>
+    <input type="password" name="password">
+    <label for="username">Passwort</label>
+</p>
+<input type="submit" value=" Log me in! " class="grid_2"> 
+
+
 </form>
 
 {% endblock %}

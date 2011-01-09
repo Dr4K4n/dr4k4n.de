@@ -33,9 +33,7 @@
                 {{ navItem('Galerie','gallery',current) }}
                 {{ navItem('Impressum','impressum',current) }}               
                 {% if session['logged_in'] %}
-                    {% if session['admin'] %}
-                        {{ navItem('Admin','admin',current) }}
-                    {% endif %}
+                    {{ navItem('Intern','intern',current) }}
                     {{ navItem('Logout','logout',current) }}
                 {% else %}
                     {{ navItem('Login','login',current) }}
@@ -53,6 +51,8 @@
             {% for message in get_flashed_messages() %}
             <div class="flash">{{ message }}</div>
             {% endfor %}
+
+            <div class="clear"></div>  
 
             <div id="main" class="grid_8 alpha">            
             {% block body %}{% endblock %}
@@ -82,9 +82,9 @@
                 <aside class="widget">
                     <h3>Twitter</h3>
                     
-                    <p>
-                        Twitter Feed Baby!
-                    </p>
+                    <div class="twitter">
+                    </div>
+                    
                 </aside> <!-- end widget -->
             
             </div> <!-- end sidebar -->

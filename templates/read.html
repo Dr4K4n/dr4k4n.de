@@ -12,9 +12,36 @@
 <div class="clear"></div>
 
 <footer class="postmeta">
-    <span class="btn alignleft">von <a href="mailto:{{ post.author.email }}">{{ post.author.username }}</a> am  <time datetime="{{ post.date }}" pubdate>{{ post.date }}</time></span>
+Blogpost von <a class="author" href="mailto:{{ post.author.email }}">{{ post.author.username }}</a> am  <time datetime="{{ post.date }}" pubdate>{{ post.date }}</time></span>
 </footer>
 
+<!-- Kommentar Formular -->
+{% if logged_in %}
+<form method="post" name="comment">
+<textarea name="comment"></textarea><br />
+<input type="submit" class="grid_2" value=" comment ">
+</form>
+{% endif %}
+
 </article>
+
+<div class="clear"></div>
+
+<!-- Kommentare -->
+
+<ul>
+{% for comment in comments %}
+
+<li>
+Kommentar von <a class="author" href="mailto:{{ post.author.email }}">{{ comment.author.username }}</a> 
+am <time datetime="{{ comment.date }}">{{ comment.date }}</time>
+<p>{{ comment.getComment()|safe }}</p>
+</li>
+
+<div class="clear"></div>
+
+{% endfor %}
+</ul>
+
 
 {% endblock %}
