@@ -5,6 +5,8 @@ from flask import Flask, request, session, g, redirect, url_for, abort, render_t
 from flaskext.sqlalchemy import SQLAlchemy
 from hashlib import md5
 from twython import Twython
+from werkzeug import secure_filename
+from os import path
 
 SECRET_KEY = 'VERYS3CR3T!'
 DEBUG = True
@@ -65,15 +67,28 @@ class BlogPost(db.Model):
         self.author_id = author_id;
         self.shorttext = shorttext;
         self.longtext = longtext;
-    
-    def getShorttext(self):
-        return unicode.replace(self.shorttext,'\n','<br>')
         
     def getText(self):
-        return unicode.replace(self.shorttext + self.longtext,'\n','<br>')
-    
+        return self.shorttext + self.longtext
+        
     def __repr__(self):
         return '<BlogPost %r>' % self.id
+
+class Thumbnail(db.Model):
+    __tablename__ = 'thumbnails'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50), nullable=False)
+    url = db.Column(db.String(100), nullable=False)
+    
+    def __init__(self, title, url):
+        self.title = title
+        self.url = url
+    
+    def getImage(self):
+        return '<img src="{{ url_for(\'static\',\''+self.url+'\') }}">'
+    
+    def __repr__(self):
+        return '<Thumbnail %r>' % self.id
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -89,9 +104,6 @@ class Comment(db.Model):
 		self.post_id = post_id
 		self.author_id = author_id
 		self.comment = comment
-
-    def getComment(self):
-        return unicode.replace(self.comment,'\n','<br>')	
         
     def __repr__(self):
         return '<Comment %r>' % self.id
@@ -111,9 +123,6 @@ class StaticPage(db.Model):
         self.text = text
         self.author_id = author_id
         self.menu = menu
-        
-    def getText(self):
-        return unicode.replace(self.text,'\n','<br>')
     
     def __repr__(self):
         return '<Page %r>' % self.id
@@ -363,6 +372,27 @@ def bloggen_del(post_id):
     flash(u'Post entfernt')
     return redirect(url_for('intern'))
 
+# thumbnail verwaltung
+@app.route('/thumb/new',methods=['GET', 'POST'])
+def thumb_new():
+    if not session.get('logged_in'):        
+        flash(u'ohne Login wird das aber nix...')
+        return redirect(url_for('login'))
+        
+    if not request.form:
+        return my_render_template('thumb_new.html', current='intern');
+    
+    img = request.files['img']
+    url = secure_filename(img.filename)
+    
+    img.save(path.join('static/thumbnails', img.filename))
+    
+    newThumb = Thumbnail(request.form['title'], url)
+    db.session.add(newThumb)
+    db.session.commit()
+    flash(u'nice one - is drin ;-)')
+    return redirect(url_for('intern'))
+    
 # static page verwaltung
 @app.route('/page/verwalten')
 def page_verwalten():

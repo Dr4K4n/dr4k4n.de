@@ -6,9 +6,9 @@
 
 <h2><a href="{{ url_for('read_post', post_id=post.id) }}">{{ post.title }}</a></h2>
 
-<a href="#"><img src="{{ url_for('static', filename='images/thumbnail.jpg') }}" alt="" class="thumbnail alignleft" /></a>
+<a href="#"><img src="{{ url_for('static', filename='thumbnails/thumbnail.jpg') }}" alt="" class="thumbnail alignleft" /></a>
 
-<p>{{ post.getShorttext()|safe }}</p>
+<p>{{ post.shorttext|safe }}</p>
 
 <div class="clear"></div>
 

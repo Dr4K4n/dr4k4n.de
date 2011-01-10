@@ -5,7 +5,7 @@
 
 <h2><a href="#">{{ post.title }}</a></h2>
 
-<a href="#"><img src="{{ url_for('static', filename='images/thumbnail.jpg') }}" alt="" class="thumbnail alignleft" /></a>
+<a href="#"><img src="{{ url_for('static', filename='thumbnails/thumbnail.jpg') }}" alt="" class="thumbnail alignleft" /></a>
 
 <p>{{ post.getText()|safe }}</p>
 
@@ -35,7 +35,7 @@ Blogpost von <a class="author" href="mailto:{{ post.author.email }}">{{ post.aut
 <li>
 Kommentar von <a class="author" href="mailto:{{ post.author.email }}">{{ comment.author.username }}</a> 
 am <time datetime="{{ comment.date }}">{{ comment.date }}</time>
-<p>{{ comment.getComment()|safe }}</p>
+<p>{{ comment.comment|safe }}</p>
 </li>
 
 <div class="clear"></div>
