@@ -1,9 +1,9 @@
 {% macro navItem(title, menuPunkt, current) -%}
-<li class="{{ 'current'if current==menuPunkt }}"><a href="{{ url_for(menuPunkt) }}">{{ title }}</a></li>
+<li class="tabs{{ ' current'if current==menuPunkt }}"><a href="{{ url_for(menuPunkt) }}">{{ title }}</a></li>
 {%- endmacro %}
 
 {% macro navItemStatic(title, page, current) -%}
-<li class="{{ 'current'if current==page }}"><a href="{{ url_for('staticPage', page_id=page) }}">{{ title }}</a></li>
+<li class="tabs{{ ' current'if current==page }}"><a href="{{ url_for('staticPage', page_id=page) }}">{{ title }}</a></li>
 {%- endmacro %}
 
 <!DOCTYPE html>
@@ -18,7 +18,8 @@
     
     <link href="{{ url_for('static', filename='960.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" type="text/css" />  
-    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/x-icon">    
+    <link href="{{ url_for('static', filename='favicon.ico') }}" rel="shortcut icon" type="image/x-icon">   
+    <link href='http://fonts.googleapis.com/css?family=Walter+Turncoat' rel='stylesheet' type='text/css'> 
 </head>
 
 <body>
@@ -101,7 +102,7 @@
         
         <footer id="footer" class="grid_12">
         <!-- You're free to remove the credit link in the footer, but please, please leave it there. -->
-        <p>Copyright &copy; 2010 <a href="#">Dr4K4n.de</a> - Design by <a href="http://jayj.dk" title="Design by Jayj.dk">Jayj.dk</a></p>
+        <p>Copyright &copy; 2011 <a href="#">Dr4K4n.de</a> - Design by <a href="http://jayj.dk" title="Design by Jayj.dk">Jayj.dk</a></p>
         </footer> <!-- end footer -->
         
         <div class="clear"></div>        

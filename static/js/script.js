@@ -8,4 +8,12 @@ $(document).ready(function(){
         
     $(".twitter").load("/backend/getTweets"); // Load twitter feeds
     
+    $(".dropdown").each(function () {
+        $(this).parent().eq(0).hover(function () {
+            $(".dropdown:eq(0)", this).show();
+        }, function () {
+            $(".dropdown:eq(0)", this).hide();
+        });
+    });
+    
 });

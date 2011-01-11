@@ -1,7 +1,6 @@
 {% for t in tweets%}
 <p>
-<a target="_blank" href="https://twitter.com/#!/Dr4K4n/status/{{ t[0] }}">
-{{ t[1] }}
-</a>
+<a target="_blank" href="https://twitter.com/#!/Dr4K4n/status/{{ t[0] }}">#</a>
+{{ t[1]|safe }}
 </p>
 {% endfor %}

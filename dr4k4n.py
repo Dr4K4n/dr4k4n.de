@@ -507,7 +507,7 @@ def get_tweets():
 	tweets = []
 	t_i = 0
 	for t in tweetsAll:
-		if t_i > 9:
+		if t_i > 7:
 			break
 		tweets.append([t['id'],t['text']])
 		t_i += 1

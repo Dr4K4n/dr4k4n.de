@@ -115,8 +115,11 @@ h6 { font-size: 14px; }
 
 #header h1,
 .post h2,
-h3 {
-	font-family: 'ChunkFive Regular', Arial, Helvetica, sans-serif; /* Chunkfive is called via @font-face */
+h3,
+h4 {
+	/*font-family: 'ChunkFive Regular', Arial, Helvetica, sans-serif;*/ /* Chunkfive is called via @font-face */
+	font-family: 'Walter Turncoat', Arial, Helvetica, sans-serif;
+	padding-left: 20px;
 }
 
 hr { border: 0 solid #ccc; border-top-width: 1px; clear: both; height: 0; }
@@ -205,10 +208,23 @@ blockquote p { margin: 0; }
 	padding: 40px 10px 0 10px;
 }
 
+#content table {
+    border: 1px dotted gray;
+}
+
+#content table th {
+    padding: 0 20px;
+}
+
+#content table td {
+    padding: 0 5px;
+}
+
 /* Nav */
 #menu {
 	border-bottom: 1px solid #cacaca;
 	list-style: none;
+    font-family: 'Walter Turncoat', Arial, Helvetica, sans-serif;
 }
 
 #menu li {
@@ -503,4 +519,67 @@ img.alignright { margin-left: 15px; }
 	-moz-transform: rotate(-1deg);
 	transform: rotate(-1deg);
  }
+ 
+/* tabs
+*************************/
+ul.tabs {
+    display: table;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    position: relative;
+}
+
+ul.tabs li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: table-cell;
+    float: left;
+    position: relative;
+}
+
+ul.tabs a {
+    position: relative;
+    display: block;
+}
+
+/* dropdowns
+*************************/
+ul.dropdown {
+    margin: 0;
+    padding: 0;
+    display: block;
+    position: absolute;
+    z-index: 999;
+    top: 100%;
+    width: 250px;
+    display: none;
+    left: 0;
+}
+
+ul.dropdown ul.dropdown {
+    top: 0;
+    left: 95%;
+}
+
+ul.dropdown li {
+    margin: 0;
+    padding: 0;
+    float: none;
+    position: relative;
+    list-style: none;
+    display: block;
+}
+
+ul.dropdown li a
+{
+    display: block;
+}
+
+div.twitter {
+    font-size: 12px;
+    line-height: 130%;
+}
+
 
