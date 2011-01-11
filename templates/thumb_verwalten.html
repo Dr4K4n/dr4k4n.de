@@ -1,0 +1,19 @@
+{% extends "index.html" %}
+{% block body %}
+
+<h3>Thumbnails 1,2,3,...</h3>
+
+<table>
+
+<tr><th colspan="3">Title</th></tr>
+
+{% for thumb in thumbnails %}
+<tr>
+    <td>{{ thumb.title }}</td>
+    <td><a href="{{ url_for('thumb_del', thumb_id=thumb.id) }}">DEL</a></td>
+</tr>
+{% endfor %}
+
+</table>
+
+{% endblock %}

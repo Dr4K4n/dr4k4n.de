@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python
+﻿#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
@@ -52,28 +52,6 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-class BlogPost(db.Model):
-    __tablename__ = 'blogposts'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(50), nullable=False)
-    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    author = db.relationship(User, uselist=False, backref=db.backref('BlogPoster',cascade="none"))
-    shorttext = db.Column(db.Text, nullable=False)
-    longtext = db.Column(db.Text, nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
-    
-    def __init__(self, title, author_id, shorttext, longtext):
-        self.title = title;
-        self.author_id = author_id;
-        self.shorttext = shorttext;
-        self.longtext = longtext;
-        
-    def getText(self):
-        return self.shorttext + self.longtext
-        
-    def __repr__(self):
-        return '<BlogPost %r>' % self.id
-
 class Thumbnail(db.Model):
     __tablename__ = 'thumbnails'
     id = db.Column(db.Integer, primary_key=True)
@@ -89,6 +67,31 @@ class Thumbnail(db.Model):
     
     def __repr__(self):
         return '<Thumbnail %r>' % self.id
+
+class BlogPost(db.Model):
+    __tablename__ = 'blogposts'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(50), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    author = db.relationship(User, uselist=False, backref=db.backref('BlogPoster',cascade="none"))
+    thumb_id = db.Column(db.Integer, db.ForeignKey('thumbnails.id'))
+    thumb = db.relationship(Thumbnail, uselist=False, backref=db.backref('Thumbnail', cascade="none"))
+    shorttext = db.Column(db.Text, nullable=False)
+    longtext = db.Column(db.Text, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    
+    def __init__(self, title, author_id, thumb_id, shorttext, longtext):
+        self.title = title;
+        self.thumb_id = thumb_id;
+        self.author_id = author_id;
+        self.shorttext = shorttext;
+        self.longtext = longtext;
+        
+    def getText(self):
+        return self.shorttext + self.longtext
+        
+    def __repr__(self):
+        return '<BlogPost %r>' % self.id
 
 class Comment(db.Model):
     __tablename__ = 'comments'
@@ -324,7 +327,8 @@ def bloggen_new():
         return redirect(url_for('login'))
     
     if not request.form:
-        return my_render_template('bloggen_new.html', current='intern');
+        thumbnails = Thumbnail.query.all()
+        return my_render_template('bloggen_new.html', current='intern', thumbnails=thumbnails);
     
     newPost = BlogPost(request.form['title'], session['user_id'], request.form['shorttext'], request.form['longtext'])
     db.session.add(newPost)
@@ -337,7 +341,8 @@ def bloggen_edit(post_id):
     if not session.get('logged_in'):        
         flash(u'ohne Login wird das aber nix...')
         return redirect(url_for('login'))
-        
+    
+    thumbnails = Thumbnail.query.all()    
     post = BlogPost.query.get(post_id)
 
     if post is None:
@@ -346,13 +351,14 @@ def bloggen_edit(post_id):
     
     if request.form:
         post.title = request.form['title']
+        post.thumb_id = request.form['thumbnail']
         post.shorttext = request.form['shorttext']
         post.longtext = request.form['longtext']
         db.session.commit()
         flash(u'check! Hab ich')
         return redirect(url_for('intern'))  
     
-    return my_render_template('bloggen_edit.html', current='intern', post=post);
+    return my_render_template('bloggen_edit.html', current='intern', post=post, thumbnails=thumbnails);
 
 @app.route('/bloggen/<int:post_id>/del',methods=['GET', 'POST'])
 def bloggen_del(post_id):
@@ -373,6 +379,16 @@ def bloggen_del(post_id):
     return redirect(url_for('intern'))
 
 # thumbnail verwaltung
+@app.route('/thumb/verwalten')
+def thumb_verwalten():
+    if not session.get('logged_in'):        
+        flash(u'ohne Login wird das aber nix...')
+        return redirect(url_for('login'))
+    
+    thumbnails = Thumbnail.query.all()
+    
+    return my_render_template('thumb_verwalten.html', current='intern', thumbnails=thumbnails)
+
 @app.route('/thumb/new',methods=['GET', 'POST'])
 def thumb_new():
     if not session.get('logged_in'):        
@@ -391,6 +407,24 @@ def thumb_new():
     db.session.add(newThumb)
     db.session.commit()
     flash(u'nice one - is drin ;-)')
+    return redirect(url_for('intern'))
+
+@app.route('/thumb/<int:thumb_id>/del',methods=['GET', 'POST'])
+def thumb_del(thumb_id):
+    if not session.get('logged_in'):        
+        flash(u'ohne Login wird das aber nix...')
+        return redirect(url_for('login'))
+        
+    thumb = Thumbnail.query.get(thumb_id)
+    
+    if thumb is None:
+        flash(u'Bidde? den kennsch ned!')
+        return redirect(url_for('intern'))
+    
+    db.session.delete(thumb)
+    db.session.commit()
+    
+    flash(u'Thumbnail entfernt')
     return redirect(url_for('intern'))
     
 # static page verwaltung

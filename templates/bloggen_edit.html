@@ -5,13 +5,31 @@
 
 <form method="post">
 
-<input type="text" name="title" value="{{ post.title }}"><br>
-<textarea name="shorttext">{{ post.shorttext }}
-</textarea><br>
-<textarea name="longtext">{{ post.longtext }}
-</textarea><br>
+<p>
+    <input type="text" name="title" value="{{ post.title }}">
+    <label for="title">Title</label>
+</p>
 
-<input type="submit" value=" läuft... ">
+<p>
+    <select name="thumbnail">
+        {% for thumb in thumbnails %}
+        <option value="{{ thumb.id }}" {% if thumb.id==post.thumb_id %}selected="selected"{% endif %}>{{ thumb.title }}</option>
+        {% endfor %}
+    </select>
+    <label for="thumbnail">Thumbnail</label> 
+</p>
+
+<p>
+    <textarea name="shorttext">{{ post.shorttext }}</textarea>
+    <label for="shorttext">kurzer Text...</label>
+</p>
+    
+<p>
+    <textarea name="longtext">{{ post.longtext }}</textarea>
+    <label for="longtext">...mehr Text</label>
+</p>
+
+<input type="submit" value=" läuft... " class="grid_2">
 </form>
 
 {% endblock %}

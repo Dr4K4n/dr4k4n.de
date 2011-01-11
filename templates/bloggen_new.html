@@ -5,20 +5,32 @@
 
 <form method="post">
 
+<p>
+    <input type="text" name="title">
+    <label for="title">Title</label>
+</p>
 
-<input type="text" name="title" class="grid_2">
-<label for="title">Title</label>
-<br>
+<p>
+    <select name="thumbnail">
+        {% for thumb in thumbnails %}
+        <option value="{{ thumb.id }}">{{ thumb.title }}</option>
+        {% endfor %}
+    </select>
+    <label for="thumbnail">Thumbnail</label> 
+</p>
 
-<textarea name="shorttext" class="grid_5"></textarea>
-<label for="shorttext">kurzer Text...</label>
-<br>
+<p>
+    <textarea name="shorttext"></textarea>
+    <label for="shorttext">kurzer Text...</label>
+</p>
 
-<textarea name="longtext" class="grid_5"></textarea>
-<label for="longtext">...mehr Text</label>
-<br>
+<p>
+    <textarea name="longtext"></textarea>
+    <label for="longtext">...mehr Text</label>
+</p>
 
-<input type="submit" value=" läuft... ">
+<input type="submit" value=" läuft... " class="grid_2">
+
 </form>
 
 {% endblock %}
