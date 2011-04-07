@@ -1,9 +1,17 @@
 {% macro navItem(title, menuPunkt, current) -%}
-<li class="tabs{{ ' current'if current==menuPunkt }}"><a href="{{ url_for(menuPunkt) }}">{{ title }}</a></li>
+<li class="{{ ' current'if current==menuPunkt }}"><a href="{{ url_for(menuPunkt) }}">{{ title }}</a></li>
 {%- endmacro %}
 
 {% macro navItemStatic(title, page, current) -%}
-<li class="tabs{{ ' current'if current==page }}"><a href="{{ url_for('staticPage', page_id=page) }}">{{ title }}</a></li>
+<li class="{{ ' current'if current==page }}"><a href="{{ url_for('staticPage', page_id=page) }}">{{ title }}</a></li>
+{%- endmacro %}
+
+{% macro navSubmenu(title, page, current) -%}
+<li class="{{ ' current'if current==page }}"><a href="#">{{ title }}</a>
+{%- endmacro %}
+
+{% macro navItemSubmenu(title, page, current) -%}
+<li class="subItem{{ ' current'if current==page }}"><a href="{{ url_for('staticPage', page_id=page) }}">{{ title }}</a></li>
 {%- endmacro %}
 
 <!DOCTYPE html>
@@ -37,7 +45,17 @@
             <ul id="menu" class="clearfix">
                 {{ navItem('Home','home',current) }}
                 {% for page in menuPages %}
-                    {{ navItemStatic(page.title, page.id, current) }}
+                    {% if page.subpages %}
+                        {{ navSubmenu(page.title, page.id, current) }}
+                        <ul class="dropdown">
+                        {% for subpage in page.subpages %}
+                            {{ navItemSubmenu(subpage.title, subpage.id, current) }}
+                        {% endfor %}
+                        </ul>
+                        </li>
+                    {% elif page.parent_id == 0 %}
+                        {{ navItemStatic(page.title, page.id, current) }}
+                    {% endif %}
                 {% endfor %}
                 {{ navItem('Galerie','gallery',current) }}
                 {{ navItem('Impressum','impressum',current) }}               
@@ -102,13 +120,15 @@
         
         <footer id="footer" class="grid_12">
         <!-- You're free to remove the credit link in the footer, but please, please leave it there. -->
-        <p>Copyright &copy; 2011 <a href="#">Dr4K4n.de</a> - Design by <a href="http://jayj.dk" title="Design by Jayj.dk">Jayj.dk</a></p>
+        <p>Design by <a href="http://jayj.dk" title="Design by Jayj.dk">Jayj.dk</a></p>
         </footer> <!-- end footer -->
         
         <div class="clear"></div>        
     </div> <!-- end wrapper -->
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.hoverIntent.minified.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static',filename='js/jquery.easing.1.3.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static',filename='js/script.js') }}"></script>
 
 </body>

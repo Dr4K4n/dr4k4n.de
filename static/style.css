@@ -222,7 +222,7 @@ blockquote p { margin: 0; }
 
 /* Nav */
 #menu {
-	border-bottom: 1px solid #cacaca;
+	/*border-bottom: 1px solid #cacaca;*/
 	list-style: none;
     font-family: 'Walter Turncoat', Arial, Helvetica, sans-serif;
 }
@@ -244,7 +244,7 @@ blockquote p { margin: 0; }
 }
 
 	/* Level 2 */
-	#menu ul {
+	#menu ul.dropdown {
 		background: #cacaca; /* Fallback */
 		background: rgba(202, 202, 202, 0.95);
 		display: none;
@@ -264,12 +264,17 @@ blockquote p { margin: 0; }
 		border-bottom-right-radius: 5px;
 	}
 	
-	#menu li:hover > ul { display: block;  }
-	
 	#menu ul li {
 		float: none;
 		min-width: 150px;
 	}
+	
+	/* fany menu added stuff */
+
+    #menu ul.dropdown li a:hover {
+        background: url(images/menuarrow.png) no-repeat left center;
+    }
+
 	
 /* Post */
 .post { 
@@ -349,6 +354,7 @@ blockquote p { margin: 0; }
 #footer { 
 	margin: 20px 0 30px 20px;
 	text-shadow: 1px 0 1px #fff;
+	text-align: center;
 }
 
 #footer a {
@@ -519,64 +525,8 @@ img.alignright { margin-left: 15px; }
 	-moz-transform: rotate(-1deg);
 	transform: rotate(-1deg);
  }
- 
-/* tabs
-*************************/
-ul.tabs {
-    display: table;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    position: relative;
-}
 
-ul.tabs li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: table-cell;
-    float: left;
-    position: relative;
-}
-
-ul.tabs a {
-    position: relative;
-    display: block;
-}
-
-/* dropdowns
-*************************/
-ul.dropdown {
-    margin: 0;
-    padding: 0;
-    display: block;
-    position: absolute;
-    z-index: 999;
-    top: 100%;
-    width: 250px;
-    display: none;
-    left: 0;
-}
-
-ul.dropdown ul.dropdown {
-    top: 0;
-    left: 95%;
-}
-
-ul.dropdown li {
-    margin: 0;
-    padding: 0;
-    float: none;
-    position: relative;
-    list-style: none;
-    display: block;
-}
-
-ul.dropdown li a
-{
-    display: block;
-}
-
+/* twitter */
 div.twitter {
     font-size: 12px;
     line-height: 130%;

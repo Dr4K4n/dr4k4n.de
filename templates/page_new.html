@@ -16,8 +16,16 @@
 </p>
 
 <p>
-    <input type="checkbox" name="menu">
+    <input type="checkbox" name="menu" id="page_menu_show">
     <label for="menu">Show in Menu?</label>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <label for="parent" id="page_parent_label" style="display: none;">as a Subsite of?</label>
+    <select id="page_parent" name="page_parent" style="display: none;">
+        <option></option>
+        {% for page in pages %}
+            <option name="{{ page.id }}">{{ page.title }}</option>
+        {% endfor %}
+    </select>
 </p>
 
 <input type="submit" name="submit" value=" läuft... " class="grid_2">

@@ -8,12 +8,29 @@ $(document).ready(function(){
         
     $(".twitter").load("/backend/getTweets"); // Load twitter feeds
     
-    $(".dropdown").each(function () {
-        $(this).parent().eq(0).hover(function () {
-            $(".dropdown:eq(0)", this).show();
-        }, function () {
-            $(".dropdown:eq(0)", this).hide();
-        });
+    $("#page_menu_show").click(function () {
+        $("#page_parent").toggle();
+        $("#page_parent_label").toggle();
+    });
+
+	$('.dropdown').each(function () {
+		$(this).parent().eq(0).hoverIntent({
+			timeout: 100,
+			over: function () {
+				var current = $('.dropdown:eq(0)', this);
+				current.slideDown();
+			},
+			out: function () {
+				var current = $('.dropdown:eq(0)', this);
+				current.fadeOut();
+			}
+		});
+	});	
+
+    $(".dropdown a").hover(function () {
+        $(this).stop(true).animate({paddingLeft: "35px"}, {duration: 50, easing: 'easeOutBack'});
+    }, function () {
+        $(this).stop(true).animate({paddingLeft: "10px"}, {duration: 250, easing: 'easeOutBounce'});
     });
     
 });
